@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily check for a new Spotify Soloist build (builds expire after 90 days)
+
+[Timer]
+OnCalendar=daily
+RandomizedDelaySec=2h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

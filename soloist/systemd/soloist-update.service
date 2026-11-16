@@ -1,0 +1,17 @@
+[Unit]
+Description=Update Spotify Soloist to the latest build
+Documentation=https://developer.spotify.com/documentation/soloist
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/soloist/update
+# Root is needed to replace /opt/soloist/soloist and restart soloist.service.
+ProtectSystem=full
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes

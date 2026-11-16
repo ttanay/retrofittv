@@ -1,0 +1,68 @@
+# Template: install.sh replaces @UID@ and installs this as
+# /etc/systemd/system/soloist.service.
+[Unit]
+Description=Spotify Soloist (headless Spotify Connect client)
+Documentation=https://developer.spotify.com/documentation/soloist
+Wants=network-online.target user@@UID@.service soloist-ws-proxy.service
+After=network-online.target sound.target user@@UID@.service
+# An expired build exits with code 10 and isn't restarted (see below). The
+# unit then fails and this pulls in a fresh build.
+OnFailure=soloist-update.service
+
+[Service]
+Type=simple
+User=soloist
+SupplementaryGroups=audio
+# Lock Soloist's internal WebSocket port to the proxy before it opens, and
+# remove the rule when it stops. "+" runs these as root despite User=.
+ExecStartPre=+/usr/local/libexec/soloist/ws-firewall
+ExecStart=/usr/local/libexec/soloist/launch
+ExecStopPost=-+/usr/sbin/nft delete table inet soloist_ws
+EnvironmentFile=/etc/soloist/soloist.conf
+
+# Talk to the soloist user's PipeWire session (kept running by linger).
+Environment=XDG_RUNTIME_DIR=/run/user/@UID@
+
+# The API key: systemd copies the root-only file into a private, per-service
+# credential directory. The file itself is never readable by the soloist user.
+LoadCredential=api-key:/etc/soloist/api-key
+
+# Data (device identity, stored Connect session) and cache:
+# /var/lib/soloist and /var/cache/soloist, private to the service user.
+StateDirectory=soloist
+StateDirectoryMode=0700
+CacheDirectory=soloist
+CacheDirectoryMode=0700
+UMask=0077
+
+Restart=on-failure
+RestartSec=5
+# 10 = build expired; restarting won't help, OnFailure= fetches a new one.
+RestartPreventExitStatus=10
+
+# Sandboxing
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/run/user/@UID@
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=multi-user.target

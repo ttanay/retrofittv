@@ -1,0 +1,47 @@
+[Unit]
+Description=Origin-checking proxy for the Spotify Soloist WebSocket API
+Documentation=https://developer.spotify.com/documentation/soloist
+# soloist.service pulls this in; PartOf= makes it stop and restart with Soloist.
+After=soloist.service
+PartOf=soloist.service
+
+[Service]
+Type=simple
+User=soloist-proxy
+Group=soloist-proxy
+EnvironmentFile=/etc/soloist/soloist.conf
+# Skip the proxy when the WebSocket API is off or protection is disabled.
+# ($$ passes a literal $ to the shell instead of letting systemd expand it.)
+ExecCondition=/bin/sh -c 'test -n "$$SOLOIST_WS_PORT" && test "$${SOLOIST_WS_PROTECT:-1}" = 1'
+ExecStart=/usr/bin/python3 -I /usr/local/libexec/soloist/ws-proxy.py
+Restart=on-failure
+RestartSec=2
+
+# Sandboxing: it only needs loopback TCP.
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+ProcSubset=pid
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+RestrictAddressFamilies=AF_INET AF_UNIX
+IPAddressDeny=any
+IPAddressAllow=localhost
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+UMask=0077

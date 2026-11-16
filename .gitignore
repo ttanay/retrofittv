@@ -1,0 +1,4 @@
+# Never commit Soloist secrets
+api-key
+*.key
+.env

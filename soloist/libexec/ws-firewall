@@ -1,0 +1,30 @@
+#!/bin/bash
+# Run as root by soloist.service before Soloist starts. When WebSocket
+# protection is on, only the proxy's user (soloist-proxy) may connect to
+# Soloist's internal port, so a browser can't go around the proxy.
+# soloist.service deletes the table again when Soloist stops.
+set -euo pipefail
+
+if [[ -z ${SOLOIST_WS_PORT:-} || ${SOLOIST_WS_PROTECT:-1} != 1 ]]; then
+    nft delete table inet soloist_ws 2>/dev/null || true
+    exit 0
+fi
+
+port=${SOLOIST_WS_INTERNAL_PORT:-19090}
+if [[ ! $port =~ ^[0-9]+$ ]]; then
+    echo "SOLOIST_WS_INTERNAL_PORT must be a number, got '$port'" >&2
+    exit 1
+fi
+
+# The first two lines make the reload atomic: create the table if it's
+# missing, delete it, then define it fresh.
+nft -f - <<EOF
+table inet soloist_ws
+delete table inet soloist_ws
+table inet soloist_ws {
+    chain output {
+        type filter hook output priority 0; policy accept;
+        oif "lo" tcp dport $port meta skuid != "soloist-proxy" reject with tcp reset
+    }
+}
+EOF

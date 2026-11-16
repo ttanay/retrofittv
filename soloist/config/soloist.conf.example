@@ -1,0 +1,33 @@
+# /etc/soloist/soloist.conf — non-secret Soloist settings.
+# Read by systemd (EnvironmentFile=) for soloist.service. Use KEY=value or
+# KEY="value with spaces". After editing:  sudo systemctl restart soloist
+#
+# The API key does NOT go here. Store it with:  sudo soloist-set-api-key
+
+# Name shown in the Spotify Connect device picker.
+SOLOIST_DEVICE_NAME="Retrofit TV"
+
+# Local WebSocket API port on 127.0.0.1. Leave empty to turn the API off.
+# The API has no authentication, so it never listens on other addresses;
+# use an SSH tunnel to reach it from another machine.
+SOLOIST_WS_PORT=9090
+
+# 1 = put an Origin-checking proxy on SOLOIST_WS_PORT so web pages in a browser
+# on the Pi can't control Soloist. Soloist itself then listens on
+# SOLOIST_WS_INTERNAL_PORT, which a firewall rule opens to the proxy only.
+# 0 = Soloist listens on SOLOIST_WS_PORT directly, with no browser protection.
+SOLOIST_WS_PROTECT=1
+SOLOIST_WS_INTERNAL_PORT=19090
+
+# Optional: initial volume 0-100 (empty = audio system's current volume).
+SOLOIST_INITIAL_VOLUME=
+
+# Optional: cache size in MB. 0 = no limit, otherwise >= 100.
+SOLOIST_CACHE_SIZE_MB=0
+
+# Optional: PipeWire node name or ID to route audio to
+# (list them as the service user with: wpctl status).
+SOLOIST_PIPEWIRE_DEVICE=
+
+# 1 = verbose logs in the journal.
+SOLOIST_VERBOSE=0

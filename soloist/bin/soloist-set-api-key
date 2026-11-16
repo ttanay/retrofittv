@@ -1,0 +1,27 @@
+#!/bin/bash
+# Save the Soloist API key to /etc/soloist/api-key, readable only by root.
+# The key is typed without echo, or piped in, so it stays out of shell history:
+#   sudo soloist-set-api-key
+#   sudo soloist-set-api-key < keyfile
+set -euo pipefail
+
+if [[ -t 0 ]]; then
+    read -rsp "Soloist API key: " key
+    echo
+else
+    read -r key || true
+fi
+
+if [[ -z $key ]]; then
+    echo "No key given" >&2
+    exit 1
+fi
+
+mkdir -p /etc/soloist
+(umask 077 && printf '%s\n' "$key" > /etc/soloist/api-key.new)
+mv /etc/soloist/api-key.new /etc/soloist/api-key
+echo "Saved the API key to /etc/soloist/api-key"
+
+if systemctl is-enabled -q soloist.service 2>/dev/null; then
+    systemctl restart soloist.service
+fi
