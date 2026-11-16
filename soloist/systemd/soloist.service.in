@@ -45,8 +45,14 @@ NoNewPrivileges=yes
 CapabilityBoundingSet=
 AmbientCapabilities=
 ProtectSystem=strict
-ProtectHome=yes
-ReadWritePaths=/run/user/@UID@
+# Not ProtectHome=yes: it also hides /run/user, which blocks the PulseAudio
+# client from reaching PipeWire ("Failed to create secure directory ...
+# Permission denied"). Instead, hide /home and /root, and show only this
+# user's runtime directory under an otherwise empty /run/user.
+ProtectHome=no
+InaccessiblePaths=/home /root
+TemporaryFileSystem=/run/user
+BindPaths=/run/user/@UID@
 PrivateTmp=yes
 PrivateDevices=yes
 ProtectKernelTunables=yes

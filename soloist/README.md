@@ -86,9 +86,10 @@ Re-running the installer is safe. It keeps your config and key.
 
 **Service sandbox**
 - The service runs as a dedicated, non-login `soloist` user with no capabilities.
-- `ProtectSystem=strict`, `ProtectHome`, `PrivateDevices`, and `PrivateTmp` restrict
-  file and device access, and a syscall filter blocks unusual system calls.
-  Audio goes through the user's PipeWire socket.
+- `ProtectSystem=strict`, `PrivateDevices`, and `PrivateTmp` restrict file and device
+  access. `/home` and `/root` are hidden. Under `/run/user`, the service sees only the
+  `soloist` user's own folder, which it needs to reach PipeWire.
+- A syscall filter blocks unusual system calls.
 - Updates download over HTTPS only. Spotify publishes no checksums or signatures for
   these builds, so HTTPS is the only integrity check. The updater refuses archives where
   `soloist` isn't a regular file. It test-runs each new binary as `nobody` before
