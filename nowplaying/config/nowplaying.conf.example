@@ -1,0 +1,29 @@
+# /etc/nowplaying/nowplaying.conf — settings for the Now Playing TV display.
+# Read by systemd (EnvironmentFile=). After editing:
+#   sudo systemctl restart nowplaying-bridge nowplaying-display
+#
+# The Soloist port and device name come from /etc/soloist/soloist.conf.
+
+# Port for the TV page and its feed, on 127.0.0.1 only.
+NOWPLAYING_PORT=9095
+
+# Browser: chromium (Pi 4/400/5) or cog (lighter, for Pi 3 / Zero 2 class boards).
+NOWPLAYING_ENGINE=chromium
+
+# 1 = album art sized for 1080p. 2 = sharper art for a 4K TV.
+# The page scales itself to the screen either way.
+NOWPLAYING_SCALE=1
+
+# 1 = turn the TV on and switch to the Pi's input when music starts (HDMI-CEC).
+NOWPLAYING_CEC=1
+
+# Minutes paused before showing the idle clock.
+NOWPLAYING_PAUSE_TO_IDLE=10
+
+# Minutes on the idle clock before putting the TV in standby over CEC.
+# 0 = never. Off by default: the Pi can't tell if someone switched the TV to
+# another input, so this could turn the TV off in the middle of a film.
+NOWPLAYING_IDLE_TO_STANDBY=0
+
+# Album art cache size in MB.
+NOWPLAYING_CACHE_MB=200

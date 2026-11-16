@@ -1,0 +1,54 @@
+[Unit]
+Description=Now Playing TV display (full-screen browser on tty1)
+After=nowplaying-bridge.service systemd-user-sessions.service
+Wants=nowplaying-bridge.service
+# Take over tty1 from the login prompt.
+Conflicts=getty@tty1.service
+After=getty@tty1.service
+
+[Service]
+Type=simple
+User=nowplaying-display
+EnvironmentFile=/etc/nowplaying/nowplaying.conf
+ExecStart=/usr/local/libexec/nowplaying/kiosk
+Restart=always
+RestartSec=3
+
+# A logind session on tty1 gives the browser the display.
+PAMName=login
+TTYPath=/dev/tty1
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+StandardInput=tty-fail
+StandardOutput=journal
+StandardError=journal
+UtmpIdentifier=tty1
+UtmpMode=user
+# The Pi needs no keyboard or mouse for this.
+Environment=WLR_LIBINPUT_NO_DEVICES=1
+
+# Keep the display away from the audio device so it can never take HDMI audio
+# from Soloist: only GPU, input and its own TTY. (No /dev/snd.)
+DevicePolicy=closed
+DeviceAllow=char-drm rw
+DeviceAllow=char-input r
+DeviceAllow=/dev/tty1 rw
+# The page only talks to the bridge on 127.0.0.1.
+IPAddressDeny=any
+IPAddressAllow=localhost
+
+# Chromium's own sandbox needs user namespaces and a JIT, so this unit can't
+# use RestrictNamespaces= or MemoryDenyWriteExecute=.
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+
+[Install]
+WantedBy=multi-user.target

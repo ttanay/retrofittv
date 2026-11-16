@@ -2,3 +2,6 @@
 api-key
 *.key
 .env
+
+# Python
+__pycache__/

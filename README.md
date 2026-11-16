@@ -14,6 +14,8 @@ component you can install, update and remove on its own.
 - 🎵 **Spotify Connect.** The TV shows up as a speaker in every Spotify app. Pick it from
   your phone and the music plays through the TV, powered by
   [Spotify Soloist](https://developer.spotify.com/documentation/soloist).
+- 📺 **Now Playing screen.** The TV shows the album art, song, artist and album
+  of whatever's playing, Spotify-style, and a clock when nothing is.
 - 🔌 **Local control API.** Other software on the Pi can control playback over a
   WebSocket API.
 - 🔄 **Hands-off.** It starts at boot without anyone logging in, and updates itself.
@@ -50,6 +52,7 @@ Paste your API key when asked, then pick **Living Room TV** in the Spotify app.
 | Component | Status | Description |
 |---|---|---|
 | [`soloist/`](soloist/README.md) | ✅ Working | Spotify Connect speaker with a local WebSocket API |
+| [`nowplaying/`](nowplaying/README.md) | 🧪 Built, not yet tested on a Pi | Album art and track info on the TV ([design](nowplaying/DESIGN.md)) |
 
 Each component has its own `install.sh`, `uninstall.sh` and README. Re-running an
 installer is safe: it keeps your settings and secrets.
@@ -59,8 +62,10 @@ installer is safe: it keeps your settings and secrets.
 ```
  Spotify app ──(Spotify Connect)──▶ Raspberry Pi ──(HDMI / USB audio)──▶ TV
                                         │
-                                        ├─ soloist.service           Spotify playback
-                                        └─ soloist-ws-proxy.service  local control API
+                                        ├─ soloist.service             Spotify playback
+                                        ├─ soloist-ws-proxy.service    local control API
+                                        ├─ nowplaying-bridge.service   track info + album art
+                                        └─ nowplaying-display.service  full-screen page on HDMI
 ```
 
 Every component runs as a systemd service under its own system user, with a sandbox
@@ -72,7 +77,8 @@ that limits what it can access. See the
 ```
 retrofittv/
 ├── README.md        you are here
-└── soloist/         Spotify Connect component
+├── soloist/         Spotify Connect component
+└── nowplaying/      Now Playing screen component
     ├── install.sh   installer (run with sudo on the Pi)
     ├── uninstall.sh
     ├── bin/         admin commands

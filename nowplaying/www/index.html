@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Now Playing</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body data-screen="off">
+<div id="stage">
+
+  <section id="player">
+    <!-- Two copies of the track view; the page crossfades between them. -->
+    <div class="scene">
+      <img class="bg" alt="">
+      <div class="tint"></div>
+      <div class="cover"><img alt=""><svg class="note" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="6" cy="18" r="3" fill="currentColor"/><circle cx="18" cy="16" r="3" fill="currentColor"/></svg></div>
+      <div class="meta">
+        <div class="pill">Paused</div>
+        <div class="context"></div>
+        <h1 class="title"></h1>
+        <div class="subtitle"></div>
+        <div class="collection"></div>
+      </div>
+    </div>
+    <div class="scene"></div>
+
+    <div id="progress">
+      <span id="elapsed">0:00</span>
+      <div id="bar"><div id="fill"></div></div>
+      <span id="total">0:00</span>
+    </div>
+
+    <div id="device"><span class="bars"><i></i><i></i><i></i></span><span id="device-name"></span></div>
+
+    <div id="upnext">
+      <img alt="">
+      <div><div class="label">Up next</div><div class="text"></div></div>
+    </div>
+  </section>
+
+  <section id="idle">
+    <div class="drift">
+      <div id="clock"></div>
+      <div id="date"></div>
+      <div id="last-played"></div>
+    </div>
+  </section>
+
+  <div id="volume"><span class="vlabel">Volume</span><div class="vbar"><div class="vfill"></div></div></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
