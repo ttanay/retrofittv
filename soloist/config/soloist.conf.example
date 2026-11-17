@@ -19,8 +19,14 @@ SOLOIST_WS_PORT=9090
 SOLOIST_WS_PROTECT=1
 SOLOIST_WS_INTERNAL_PORT=19090
 
-# Optional: initial volume 0-100 (empty = audio system's current volume).
+# Optional: Spotify's volume 0-100 when Soloist starts (the slider in the
+# Spotify app). Empty = audio system's current volume.
 SOLOIST_INITIAL_VOLUME=
+
+# The Pi's own audio output level 0-100, set on every start. Use the TV's
+# remote for loudness and keep this at 100. Empty = leave it to WirePlumber
+# (which starts new outputs at 40% and remembers changes).
+SOLOIST_OUTPUT_VOLUME=100
 
 # Optional: cache size in MB. 0 = no limit, otherwise >= 100.
 SOLOIST_CACHE_SIZE_MB=0

@@ -42,6 +42,7 @@ Re-running the installer is safe. It keeps your config and key.
 |---|---|
 | `/opt/soloist/soloist` | Soloist binary, downloaded from `soloist-builds.spotifycdn.com`; symlinked as `/usr/local/bin/soloist` |
 | `/etc/soloist/soloist.conf` | Non-secret settings: device name, WebSocket, volume, cache ([example](config/soloist.conf.example)) |
+| `~soloist/.config/wireplumber/wireplumber.conf.d/50-soloist-volume.conf` | Output volume from `SOLOIST_OUTPUT_VOLUME`, rewritten when Soloist starts |
 | `/etc/soloist/api-key` | API key, `root:root 0600` |
 | `/var/lib/soloist`, `/var/cache/soloist` | Device identity, stored Connect session, playback cache (`0700`) |
 | `soloist.service` | The daemon, running as the dedicated `soloist` user |
@@ -120,6 +121,12 @@ sudo ./uninstall.sh [--purge]                   # remove (purge deletes key, ses
 ```
 
 ## Troubleshooting
+
+- **Sound is quiet.** Two levels apply. Spotify's volume is the slider in the app
+  (and `SOLOIST_INITIAL_VOLUME` at start). The Pi's output level is
+  `SOLOIST_OUTPUT_VOLUME`, which defaults to 100 and is applied each time Soloist
+  starts. Check the output level with
+  `sudo -u soloist XDG_RUNTIME_DIR=/run/user/$(id -u soloist) wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null`.
 
 - **Device shows up but there's no sound.** The dedicated `soloist` user runs its own
   PipeWire. A desktop session on the Pi may already hold the audio device. Check with

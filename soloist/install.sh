@@ -83,6 +83,7 @@ echo "==> Installing scripts"
 install -D -m 755 libexec/launch.sh /usr/local/libexec/soloist/launch
 install -D -m 755 libexec/update.sh /usr/local/libexec/soloist/update
 install -D -m 755 libexec/ws-firewall /usr/local/libexec/soloist/ws-firewall
+install -D -m 755 libexec/output-volume /usr/local/libexec/soloist/output-volume
 install -D -m 644 libexec/ws-proxy.py /usr/local/libexec/soloist/ws-proxy.py
 install -D -m 755 bin/soloist-set-api-key /usr/local/sbin/soloist-set-api-key
 

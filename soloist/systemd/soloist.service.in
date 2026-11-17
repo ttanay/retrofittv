@@ -16,6 +16,8 @@ SupplementaryGroups=audio
 # Lock Soloist's internal WebSocket port to the proxy before it opens, and
 # remove the rule when it stops. "+" runs these as root despite User=.
 ExecStartPre=+/usr/local/libexec/soloist/ws-firewall
+# Apply SOLOIST_OUTPUT_VOLUME to the soloist user's WirePlumber.
+ExecStartPre=+/usr/local/libexec/soloist/output-volume
 ExecStart=/usr/local/libexec/soloist/launch
 ExecStopPost=-+/usr/sbin/nft delete table inet soloist_ws
 EnvironmentFile=/etc/soloist/soloist.conf

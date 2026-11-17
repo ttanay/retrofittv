@@ -1,0 +1,45 @@
+#!/bin/bash
+# Run as root by soloist.service before Soloist starts. Writes a WirePlumber
+# setting for the soloist user so the audio output starts at
+# SOLOIST_OUTPUT_VOLUME percent on every boot, then restarts WirePlumber if the
+# setting changed. Empty means remove it and use WirePlumber's defaults.
+set -euo pipefail
+
+file=.config/wireplumber/wireplumber.conf.d/50-soloist-volume.conf
+volume=${SOLOIST_OUTPUT_VOLUME:-}
+
+if [[ -z $volume ]]; then
+    new=
+elif [[ $volume =~ ^[0-9]+$ ]] && (( 10#$volume <= 100 )); then
+    # Volume sliders use a cubic scale; WirePlumber wants linear amplitude.
+    level=$(awk -v p="$volume" 'BEGIN { printf "%.4f", (p / 100) ^ 3 }')
+    new="# Written by soloist.service from SOLOIST_OUTPUT_VOLUME in /etc/soloist/soloist.conf.
+wireplumber.settings = {
+  # Start the audio output at this level.
+  device.routes.default-sink-volume = $level
+  # Don't restore the last saved level, so every boot starts at the one above.
+  device.restore-routes = false
+}"
+else
+    echo "SOLOIST_OUTPUT_VOLUME must be a number from 0 to 100, got '$volume'" >&2
+    exit 1
+fi
+
+# File access runs as the soloist user, so root never follows a link that
+# user might have put in its own home directory.
+as_soloist() {
+    runuser -u soloist -- sh -c 'cd && "$@"' sh "$@"
+}
+
+old=$(as_soloist cat "$file" 2>/dev/null || true)
+[[ $new == "$old" ]] && exit 0
+
+if [[ -n $new ]]; then
+    as_soloist mkdir -p "$(dirname "$file")"
+    printf '%s\n' "$new" | as_soloist tee "$file" >/dev/null
+    echo "Audio output volume set to $volume%"
+else
+    as_soloist rm -f "$file"
+    echo "Audio output volume setting removed"
+fi
+systemctl --user -M soloist@ try-restart wireplumber.service || true
