@@ -10,6 +10,9 @@ After=getty@tty1.service
 Type=simple
 User=nowplaying-display
 EnvironmentFile=/etc/nowplaying/nowplaying.conf
+# logind only gives the browser the screen when tty1 is the terminal on
+# display, so switch to it first ("+" runs this as root).
+ExecStartPre=+/usr/bin/chvt 1
 ExecStart=/usr/local/libexec/nowplaying/kiosk
 Restart=always
 RestartSec=3

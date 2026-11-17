@@ -46,7 +46,7 @@ if [[ -f /etc/nowplaying/nowplaying.conf ]]; then
 fi
 
 echo "==> Installing packages ($engine)"
-packages=(python3 python3-websockets python3-pil v4l-utils)
+packages=(python3 python3-websockets python3-pil v4l-utils kbd)  # kbd: chvt
 if [[ $engine == chromium ]]; then
     packages+=(cage chromium)
 else
